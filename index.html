@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JENGA Hardware | Online Store</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#" data-view="shop"><span>JENGA</span>Hardware</a>
+    <nav aria-label="Main">
+      <button data-view="shop" aria-current="true">Shop</button>
+      <button data-view="track">Track order</button>
+      <button data-view="admin">Admin</button>
+      <button class="cartbtn" id="openCart">Cart (<span id="cartCount">0</span>)</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- SHOP -->
+  <section id="view-shop">
+    <div class="wrap hero">
+      <h1>What are you building today?</h1>
+      <p>Tools, plumbing, electrical, paint and building materials. Order online, pick up in store or get it delivered to your site.</p>
+      <form class="search" id="searchForm" role="search">
+        <input id="q" type="search" placeholder="Search hammer, cement, paint..." aria-label="Search products">
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </div>
+    <div class="tape" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="controls">
+        <div class="chips" id="chips" role="group" aria-label="Categories"></div>
+        <select id="sort" aria-label="Sort products">
+          <option value="name">Sort: Name</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+        </select>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- TRACK -->
+  <section id="view-track" class="panel" hidden>
+    <div class="wrap">
+      <h2>Track your order</h2>
+      <div class="box">
+        <form id="trackForm">
+          <label for="trackId">Order number</label>
+          <input id="trackId" type="text" placeholder="e.g. JH-1001" required>
+          <p style="margin:12px 0 0"><button class="btn" type="submit">Check status</button></p>
+        </form>
+        <div id="trackResult"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="view-admin" class="panel" hidden>
+    <div class="wrap">
+      <h2>Store admin</h2>
+      <div class="box" id="adminLock">
+        <form id="adminForm">
+          <label for="adminPass">Admin password</label>
+          <input id="adminPass" type="password" autocomplete="off" required>
+          <p class="note">Demo password: admin123</p>
+          <p style="margin:8px 0 0"><button class="btn" type="submit">Unlock</button></p>
+          <div class="err" id="adminErr"></div>
+        </form>
+      </div>
+      <div id="adminBody" hidden>
+        <div class="stats" id="stats"></div>
+
+        <div class="box">
+          <h3 style="margin-bottom:8px">Add a product</h3>
+          <form id="addForm">
+            <div class="two">
+              <div><label for="pName">Name</label><input id="pName" type="text" required></div>
+              <div><label for="pCat">Category</label><select id="pCat" class="f"></select></div>
+              <div><label for="pPrice">Price (KES)</label><input id="pPrice" type="number" min="1" required></div>
+              <div><label for="pStock">Stock</label><input id="pStock" type="number" min="0" required></div>
+              <div><label for="pImg">Image path (optional)</label><input id="pImg" type="text" placeholder="images/my-product.jpg"></div>
+            </div>
+            <p style="margin:12px 0 0"><button class="btn" type="submit">Add product</button></p>
+          </form>
+        </div>
+
+        <div class="box">
+          <h3 style="margin-bottom:8px">Inventory</h3>
+          <div class="scroll"><table id="invTable"></table></div>
+        </div>
+
+        <div class="box">
+          <h3 style="margin-bottom:8px">Orders</h3>
+          <div class="scroll"><table id="ordTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- CART DRAWER -->
+<div class="scrim" id="scrim" hidden></div>
+<aside id="cart" aria-label="Shopping cart" hidden>
+  <header><h2>Your cart</h2><button class="btn alt sm" id="closeCart">Close</button></header>
+  <div class="lines" id="lines"></div>
+  <div class="sum" id="sum"></div>
+</aside>
+
+<!-- CHECKOUT -->
+<dialog id="checkout">
+  <form id="coForm" method="dialog">
+    <h2 style="font-size:1.6rem;margin-bottom:8px">Checkout</h2>
+    <label for="cName">Full name</label>
+    <input id="cName" type="text" required>
+    <label for="cPhone">Phone (M-Pesa number)</label>
+    <input id="cPhone" type="tel" placeholder="0712345678" required>
+    <label for="cMethod">Receive your order</label>
+    <select id="cMethod" class="f">
+      <option value="delivery">Delivery</option>
+      <option value="pickup">Pick up in store (free)</option>
+    </select>
+    <div id="addrWrap">
+      <label for="cAddr">Delivery address or site location</label>
+      <input id="cAddr" type="text">
+    </div>
+    <label for="cPay">Payment</label>
+    <select id="cPay" class="f">
+      <option>M-Pesa</option>
+      <option>Card</option>
+      <option>Cash on delivery or pickup</option>
+    </select>
+    <p class="note" id="payNote"></p>
+    <div class="err" id="coErr"></div>
+    <p style="display:flex;gap:8px;margin:16px 0 0">
+      <button class="btn" type="submit" id="placeBtn">Place order</button>
+      <button class="btn alt" type="button" id="coCancel">Back to cart</button>
+    </p>
+  </form>
+</dialog>
+
+<dialog id="done">
+  <h2 style="font-size:1.6rem;margin-bottom:8px">Order placed</h2>
+  <p>Your order number is <b id="doneId"></b>. Use it on the Track order page.</p>
+  <p class="note" id="doneNote"></p>
+  <p><button class="btn" id="doneClose">Continue shopping</button></p>
+</dialog>
+
+<script src="script.js"></script>
+</body>
+</html>
